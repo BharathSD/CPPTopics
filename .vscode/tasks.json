@@ -10,7 +10,7 @@
 				"/std:c++latest",
 				"/EHsc",
 				"/Fe:",
-				"${fileDirname}\\${fileBasenameNoExtension}.exe",
+				"${fileDirname}\\build\\${fileBasenameNoExtension}.exe",
 				"${file}"
 			],
 			"options": {
