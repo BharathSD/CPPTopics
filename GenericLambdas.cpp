@@ -26,5 +26,17 @@ int main() {
     std::cout << "Generic Lambda (int): " << genericLambda(5, 10) << "\n";
     std::cout << "Generic Lambda (double): " << genericLambda(5.5, 10.5) << "\n";
 
+    auto print_all = [](const auto&... args) {
+        /*
+        This lambda prints all arguments passed to it.
+        This is a c++17 feature called fold expressions.
+        This expression expands the parameter pack and prints each argument.
+        */
+        ((std::cout << args << " "), ...);
+        std::cout << "\n";
+    };
+
+    print_all(1, 2.5, "Hello");
+
     return 0;
 }
