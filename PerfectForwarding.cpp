@@ -42,6 +42,11 @@ void singleArgFuncWrapper(T&& arg) {
     singleArgFunc(std::forward<T>(arg));
 }
 
+template <typename T, typename... Args>
+std::unique_ptr<T> createUnique(Args&&... args) {
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
 int main() {
     int a = 5, b = 10;
     functionWrapper(a, b);
