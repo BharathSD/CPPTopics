@@ -2,6 +2,11 @@
 #include <vector>
 #include <string>
 
+template<typename f, typename... Args>
+void apply_function(f&& func, Args&&... args) {
+    (func(std::forward<Args>(args)), ...);
+}
+
 int main() {
     /*
     This lambda prints all arguments passed to it.
@@ -134,12 +139,10 @@ int main() {
 
     std::cout << "Bitwise Xor: " << bitwise_xor(5, 3, 1) << "\n";
 
-    // bitwise Or
-    auto bitwise_or = [](const auto&... args) {
-        return (args | ...);
+    auto simplePrint = [](const auto& arg) {
+        std::cout << arg << "\n";
     };
 
-    std::cout << "Bitwise Or: " << bitwise_or(5, 3, 1) << "\n";
-
+    apply_function(simplePrint, 1, 2, 3, 4, 5);
     return 0;
 }
