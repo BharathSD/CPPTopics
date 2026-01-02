@@ -1,11 +1,20 @@
 #include <iostream>
 #include <variant>
+#include <vector>
+#include <array>
+#include <string>
+#include <string_view>
+#include <type_traits>
+
 
 /*
 Description: Demonstrating the use of std::variant in C++
 std::variant can hold one of several types. it acts like a type-safe union.
 the data can be accessed in a type-safe manner using std::visit or std::get or std::get_if
 */
+// helper trait for dependent false
+template<class>
+struct always_false : std::false_type {};
 
 template<unsigned N>
 std::string repeat(std::string_view str) {
@@ -50,12 +59,12 @@ struct Multiplier_visitor {
         }
         else {
             static_assert(always_false<T>::value, "Non-exhaustive visitor");
+            // cannot use static_assert in a non-type context, hence the helper trait
         }
     }
 };
 
 // another visitor
-template<typename T>
 struct Add_visitor {
     template<typename U>
     void operator()(U& value) const {
@@ -70,6 +79,50 @@ struct Add_visitor {
         }
     }
 };
+
+// visitor for few data types
+template<unsigned N>
+struct Arithmetic_visitor {
+    template<typename U>
+    std::enable_if_t<std::is_arithmetic_v<U>, void>
+    operator()(U& value) const {
+        value *= N;
+    }
+};
+
+template<unsigned N>
+struct string_visitor {
+    void operator()(std::string& value) const {
+       value = repeat<N>(value);
+    }
+};
+
+// helper trait using a language feature called variadic using declarations
+template<unsigned N>
+struct Visitor_helper : Arithmetic_visitor<N>, string_visitor<N> {
+    using Arithmetic_visitor<N>::operator();
+    using string_visitor<N>::operator();
+};
+
+
+// another example of variadic using declarations
+/*
+lets try and understand what is happening here.
+- The below struct 'overload' inherits from all the (variadic) template parameters
+- It also brings all their operator() overloads into the current scope using variadic using declarations
+- Additionally we have added the deduction guide, so that it is quicker to instantiate the overload struct
+- usage:
+overload{Arithmetic_visitor<2>{}, string_visitor<2>{}}(value);
+*/
+template<typename... Ts>
+struct overload : Ts... {
+    using Ts::operator()...;
+};
+
+// the deduction guide
+template<typename... Ts>
+overload(Ts...) -> overload<Ts...>;
+
 
 int main()
 {
@@ -101,5 +154,34 @@ int main()
 
     std::visit(Multiplier_visitor<2>{}, var);
     std::cout << "After multiplication/repetition: " << std::get<std::string>(var) << std::endl;
+
+
+    std::vector<std::variant<int, std::string>> vec = {42, "Hello, Variant!"};
+    for (auto& v : vec) {
+        std::visit(Visitor_helper<2>{}, v);
+    }
+
+    std::variant<int, std::string, std::array<int, 3>> v = 10;
+    constexpr unsigned N = 3;
+    auto overloader = overload{
+        [](std::string& str) {str = repeat<N>(str);},
+        [](std::array<int, 3>& arr) {
+            for (auto& v : arr) {
+                v *= N;
+            }
+        },
+        [](int& t) { t *= N; }
+    };
+
+    std::visit(overloader, v);
+
+    // changing the value
+    v = std::array<int, 3>{1, 2, 3};
+    std::visit(overloader, v);
+
+    // change the value
+    v = "42";
+    std::visit(overloader, v);
+
     return 0;
 }
