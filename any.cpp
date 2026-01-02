@@ -1,5 +1,6 @@
 #include <iostream>
 #include <any>
+#include <vector>
 
 /*
 std::any can hold any type of value.
@@ -29,6 +30,11 @@ int main() {
     std::cout << "has value: " << a.has_value() << std::endl;
     a.reset();
     std::cout << "has value: " << a.has_value() << std::endl;
+
+    std::vector<std::any> vec;
+    vec.push_back(42);
+    vec.push_back(std::string("Hello, Any!"));
+    vec.push_back(3.14);
 
 
     return 0;

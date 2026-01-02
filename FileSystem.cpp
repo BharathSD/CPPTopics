@@ -2,6 +2,13 @@
 #include <filesystem>
 #include <fstream>
 
+/*
+   File System Operations
+   This section demonstrates various file system operations using the C++17 filesystem library.
+   The various operations include checking file existence, iterating directories, and manipulating paths.
+   The filesystem library provides a convenient and portable way to perform these operations.
+   
+*/
 namespace fs = std::filesystem;
 
 int main() {
