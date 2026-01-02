@@ -6,6 +6,71 @@ Description: Demonstrating the use of std::variant in C++
 std::variant can hold one of several types. it acts like a type-safe union.
 the data can be accessed in a type-safe manner using std::visit or std::get or std::get_if
 */
+
+template<unsigned N>
+std::string repeat(std::string_view str) {
+    std::string result;
+    for (unsigned i = 0; i < N; ++i) {
+        result += str;
+    }
+    return result;
+}
+
+// this is pre c++17 style of writing a visitor
+template<unsigned N>
+struct Multiplier_visitor_old {
+    template<typename T>
+    void operator()(T& value) const {
+        value *= N;
+    }
+    void operator()(std::string& value) const {
+        value = repeat<N>(value);
+    }
+
+    void operator()(std::array<int, 3>& arr) const {
+        for (auto& v : arr) {
+            v *= N;
+        }
+    }
+};
+
+// in c++17 or later, we can use constexpr if
+template<unsigned N>
+struct Multiplier_visitor {
+    template<typename T>
+    void operator()(T& value) const {
+        if constexpr (std::is_arithmetic_v<T>) {
+            value *= N;
+        } else if constexpr (std::is_same_v<T, std::string>) {
+            value = repeat<N>(value);
+        } else if constexpr (std::is_same_v<T, std::array<int, 3>>) {
+            for (auto& v : value) {
+                v *= N;
+            }
+        }
+        else {
+            static_assert(always_false<T>::value, "Non-exhaustive visitor");
+        }
+    }
+};
+
+// another visitor
+template<typename T>
+struct Add_visitor {
+    template<typename U>
+    void operator()(U& value) const {
+        if constexpr (std::is_arithmetic_v<U>) {
+            value += value;
+        } else if constexpr (std::is_same_v<U, std::string>) {
+            value += value;
+        } else if constexpr (std::is_same_v<U, std::array<int, 3>>) {
+            for (auto& v : value) {
+                v += v;
+            }
+        }
+    }
+};
+
 int main()
 {
     std::variant<int, std::string> var;
@@ -15,6 +80,9 @@ int main()
     std::visit([](auto&& arg) {
         std::cout << "Value: " << arg << std::endl;
     }, var);
+
+    std::visit(Multiplier_visitor<2>{}, var);
+    std::cout << "After multiplication/repetition: " << std::get<int>(var) << std::endl;
 
     var = "Hello, Variant!";
     // using get
@@ -30,6 +98,8 @@ int main()
     } else {
         std::cout << "Variant does not hold a string." << std::endl;
     }
-    
+
+    std::visit(Multiplier_visitor<2>{}, var);
+    std::cout << "After multiplication/repetition: " << std::get<std::string>(var) << std::endl;
     return 0;
 }
