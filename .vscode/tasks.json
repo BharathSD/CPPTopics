@@ -2,9 +2,23 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "cppbuild",
-			"label": "Build with MSVC",
-			"command": "cl.exe",
+			"label": "Init build directories",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"New-Item -ItemType Directory -Path \"$PWD/build\",\"$PWD/build/release\" -Force | Out-Null"
+			],
+			"group": "build"
+		},
+			{
+				"type": "cppbuild",
+				"label": "Build with MSVC",
+				"dependsOn": "Init build directories",
+				"command": "cl.exe",
 			"args": [
 				"/Zi",
 				"/std:c++latest",
@@ -19,15 +33,16 @@
 			"problemMatcher": [
 				"$msCompile"
 			],
-			"group": {
-				"kind": "build",
-			},
-			"detail": "compiler: cl.exe"
+					 "group": {
+						 "kind": "build"
+					 },
+					 "detail": "compiler: cl.exe"
 		},
-		{
-			"label": "Build Release with MSVC",
-			"type": "cppbuild",
-			"command": "cl.exe",
+			{
+				"label": "Build Release with MSVC",
+				"type": "cppbuild",
+				"dependsOn": "Init build directories",
+				"command": "cl.exe",
 			"args": [
 				"/O2",
 				"/DNDEBUG",
@@ -44,10 +59,10 @@
 			"problemMatcher": [
 				"$msCompile"
 			],
-			"group": {
-				"kind": "build",
-			},
-			"detail": "compiler: cl.exe"
+					 "group": {
+						 "kind": "build"
+					 },
+					 "detail": "compiler: cl.exe"
 		}
 	]
 }
