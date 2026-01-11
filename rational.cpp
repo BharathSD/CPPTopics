@@ -1,7 +1,7 @@
 #include <format>
 #include <string>
 
-// #define NON_MEMBER_OVERLOAD
+#define NON_MEMBER_OVERLOAD
 using std::string;
 
 // format-style print()
@@ -36,7 +36,7 @@ public:
     Rational& operator -- (); // prefix
     Rational operator -- (int); // postfix
     // conversion operator
-    operator auto() const { return str(); }
+    operator std::string() const { return str(); }
 };
 
 Rational Rational::reduce() const {
@@ -53,7 +53,7 @@ Rational Rational::reduce() const {
 string Rational::str() const {
     if(d == 0) 
         return nanstr;
-    if(d == 1 || n == 0) 
+    if( n == 0) 
         return std::to_string(n);
 
     auto abs_n = abs(n);     // absolute value
@@ -188,7 +188,8 @@ int main() {
     print("a / b = {}\n", a / b);
 
     // addition an integer
-    print("a + 1 = {}\n", a + 1);
+    // addition of Rational + integer
+    print("a + 1 = {}\n", a + 1); // --> deduced : 1 -> Rational{1};
     
 
 #ifdef NON_MEMBER_OVERLOAD

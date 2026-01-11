@@ -2,7 +2,7 @@
 #include <typeinfo>
 #include<vector>
 //.
-consteval int get_value(){
+consteval const int get_value(){
     return 3;
 }
 
@@ -74,6 +74,7 @@ int main(){
     // of type const int
     std::cout << "type of x14 : " << typeid(x14).name() << std::endl;
     // x14 = 100; // error: assignment of read-only variable 'x14' as it is const int
+    
 
     auto& x15 = cref;
     // of type const int&

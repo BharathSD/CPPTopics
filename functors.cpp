@@ -25,11 +25,15 @@ public:
 int main() {
     const MultBy times2(2);
     const MultBy times5(5);
-    const MultBy times24(4);
+    const MultBy times4(4);
 
     print("times2(3) = {}\n", times2(3));
     print("times5(5) = {}\n", times5(5));
-    print("times24(12) = {}\n", times24(12));
+    print("times4(12) = {}\n", times4(12));
+
+
+    auto times20 = [](int x) { return x * 20; };
+    print("times20(3) = {}\n", times20(3));
 
     const Append appendExclamation("!");
     print("appendExclamation(\"Hello\") = {}\n", appendExclamation("Hello"));
